@@ -2,7 +2,7 @@
 
 function sum(a, b) {
   // Bug 1: Should return a + b, but it's currently subtracting
-  return a - b;
+  return a + b;
 }
 
 function multiply(a, b) {
