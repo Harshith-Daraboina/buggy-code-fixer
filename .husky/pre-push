@@ -1,0 +1,16 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🔍 Running tests before push..."
+npm test
+
+if [ $? -ne 0 ]; then
+  echo ""
+  echo "❌ Tests failed! Push rejected."
+  echo "💡 Fix the bugs in buggy-code/script.js and try again."
+  exit 1
+fi
+
+echo ""
+echo "✅ All tests passed! Push allowed."
+exit 0

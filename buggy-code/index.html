@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bug Fix Challenge - Interactive Tester</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+        .bug-info {
+            background: rgba(255, 193, 7, 0.2);
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .bug-info strong {
+            color: #ffc107;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            margin: 10px 5px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .output {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 10px;
+            min-height: 100px;
+            font-family: monospace;
+        }
+        .success {
+            color: #4CAF50;
+        }
+        .error {
+            color: #f44336;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐛 Bug Fix Challenge</h1>
+        <p class="subtitle">Test your fixes interactively before pushing to Git!</p>
+        
+        <div class="bug-info">
+            <strong>🎯 Challenge:</strong> Fix all 5 bugs in script.js to make all tests pass. 
+            You cannot push to Git until all bugs are fixed (Husky pre-push hook will block you)!
+        </div>
+
+        <button onclick="testSum()">Test sum()</button>
+        <button onclick="testMultiply()">Test multiply()</button>
+        <button onclick="testIsEven()">Test isEven()</button>
+        <button onclick="testFindMax()">Test findMax()</button>
+        <button onclick="testReverseString()">Test reverseString()</button>
+        <button onclick="runAllTests()" style="background: #2196F3;">🧪 Run All Tests</button>
+
+        <div class="output" id="output">Click a button to test the functions...</div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Add test functions to the global scope for HTML button onclick handlers
+        window.testSum = function() {
+            const output = document.getElementById('output');
+            try {
+                const result1 = sum(2, 3);
+                const result2 = sum(10, -5);
+                if (result1 === 5 && result2 === 5) {
+                    output.innerHTML = `<span class="success">✅ sum() works! ${result1} and ${result2} are correct!</span>`;
+                } else {
+                    output.innerHTML = `<span class="error">❌ sum() failed! Got ${result1} and ${result2}, expected 5 and 5</span>`;
+                }
+            } catch (e) {
+                output.innerHTML = `<span class="error">❌ Error: ${e.message}</span>`;
+            }
+        };
+
+        window.testMultiply = function() {
+            const output = document.getElementById('output');
+            try {
+                const result1 = multiply(3, 4);
+                const result2 = multiply(-2, 5);
+                if (result1 === 12 && result2 === -10) {
+                    output.innerHTML = `<span class="success">✅ multiply() works! ${result1} and ${result2} are correct!</span>`;
+                } else {
+                    output.innerHTML = `<span class="error">❌ multiply() failed! Got ${result1} and ${result2}, expected 12 and -10</span>`;
+                }
+            } catch (e) {
+                output.innerHTML = `<span class="error">❌ Error: ${e.message}</span>`;
+            }
+        };
+
+        window.testIsEven = function() {
+            const output = document.getElementById('output');
+            try {
+                const result1 = isEven(4);
+                const result2 = isEven(5);
+                if (result1 === true && result2 === false) {
+                    output.innerHTML = `<span class="success">✅ isEven() works! isEven(4)=${result1}, isEven(5)=${result2}</span>`;
+                } else {
+                    output.innerHTML = `<span class="error">❌ isEven() failed! Got isEven(4)=${result1}, isEven(5)=${result2}</span>`;
+                }
+            } catch (e) {
+                output.innerHTML = `<span class="error">❌ Error: ${e.message}</span>`;
+            }
+        };
+
+        window.testFindMax = function() {
+            const output = document.getElementById('output');
+            try {
+                const result1 = findMax([1, 5, 3, 9, 2]);
+                const result2 = findMax([-10, -5, -8]);
+                if (result1 === 9 && result2 === -5) {
+                    output.innerHTML = `<span class="success">✅ findMax() works! Max is ${result1} and ${result2}</span>`;
+                } else {
+                    output.innerHTML = `<span class="error">❌ findMax() failed! Got ${result1} and ${result2}, expected 9 and -5</span>`;
+                }
+            } catch (e) {
+                output.innerHTML = `<span class="error">❌ Error: ${e.message}</span>`;
+            }
+        };
+
+        window.testReverseString = function() {
+            const output = document.getElementById('output');
+            try {
+                const result1 = reverseString("hello");
+                const result2 = reverseString("Challenge");
+                if (result1 === "olleh" && result2 === "egnellahC") {
+                    output.innerHTML = `<span class="success">✅ reverseString() works! Reversed to "${result1}" and "${result2}"</span>`;
+                } else {
+                    output.innerHTML = `<span class="error">❌ reverseString() failed! Got "${result1}" and "${result2}"</span>`;
+                }
+            } catch (e) {
+                output.innerHTML = `<span class="error">❌ Error: ${e.message}</span>`;
+            }
+        };
+
+        window.runAllTests = function() {
+            const output = document.getElementById('output');
+            let passed = 0;
+            let total = 5;
+            let results = [];
+
+            // Test sum
+            try {
+                const r1 = sum(2, 3);
+                const r2 = sum(10, -5);
+                if (r1 === 5 && r2 === 5) {
+                    passed++;
+                    results.push("✅ sum()");
+                } else {
+                    results.push("❌ sum()");
+                }
+            } catch (e) {
+                results.push("❌ sum() - Error");
+            }
+
+            // Test multiply
+            try {
+                const r1 = multiply(3, 4);
+                const r2 = multiply(-2, 5);
+                if (r1 === 12 && r2 === -10) {
+                    passed++;
+                    results.push("✅ multiply()");
+                } else {
+                    results.push("❌ multiply()");
+                }
+            } catch (e) {
+                results.push("❌ multiply() - Error");
+            }
+
+            // Test isEven
+            try {
+                if (isEven(4) === true && isEven(5) === false) {
+                    passed++;
+                    results.push("✅ isEven()");
+                } else {
+                    results.push("❌ isEven()");
+                }
+            } catch (e) {
+                results.push("❌ isEven() - Error");
+            }
+
+            // Test findMax
+            try {
+                if (findMax([1, 5, 3, 9, 2]) === 9 && findMax([-10, -5, -8]) === -5) {
+                    passed++;
+                    results.push("✅ findMax()");
+                } else {
+                    results.push("❌ findMax()");
+                }
+            } catch (e) {
+                results.push("❌ findMax() - Error");
+            }
+
+            // Test reverseString
+            try {
+                if (reverseString("hello") === "olleh" && reverseString("Challenge") === "egnellahC") {
+                    passed++;
+                    results.push("✅ reverseString()");
+                } else {
+                    results.push("❌ reverseString()");
+                }
+            } catch (e) {
+                results.push("❌ reverseString() - Error");
+            }
+
+            // Display results
+            if (passed === total) {
+                output.innerHTML = `<div class="success"><strong>🎉 All ${total} tests passed! You're ready to push!</strong><br><br>${results.join('<br>')}</div>`;
+            } else {
+                output.innerHTML = `<div class="error"><strong>❌ ${passed}/${total} tests passed. Keep fixing!</strong><br><br>${results.join('<br>')}</div>`;
+            }
+        };
+    </script>
+</body>
+</html>

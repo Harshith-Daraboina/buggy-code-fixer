@@ -1,0 +1,19 @@
+module.exports = {
+  testEnvironment: 'node',
+  testMatch: ['**/test/**/*.test.js'],
+  collectCoverageFrom: [
+    'buggy-code/**/*.js',
+    '!**/node_modules/**'
+  ],
+  coverageThreshold: {
+    global: {
+      branches: 0,
+      functions: 0,
+      lines: 0,
+      statements: 0
+    }
+  },
+  verbose: true,
+  bail: false,
+  testTimeout: 5000
+};
