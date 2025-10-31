@@ -1,5 +1,5 @@
 module.exports = {
-  testEnvironment: 'node',
+  testEnvironment: 'jsdom',
   testMatch: ['**/test/**/*.test.js'],
   collectCoverageFrom: [
     'buggy-code/**/*.js',
@@ -15,5 +15,6 @@ module.exports = {
   },
   verbose: true,
   bail: false,
-  testTimeout: 5000
+  testTimeout: 5000,
+  setupFilesAfterEnv: []
 };

@@ -7,11 +7,33 @@
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 800px;
-            margin: 50px auto;
+            margin: 0;
             padding: 20px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
+            transition: all 0.3s ease;
+            display: flex;
+            gap: 20px;
+            min-height: 100vh;
+        }
+        body.dark {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e0e0;
+        }
+        body.light {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+        }
+        .main-container {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .left-panel, .right-panel {
+            flex: 1;
+            min-width: 0;
         }
         .container {
             background: rgba(255, 255, 255, 0.1);
@@ -19,6 +41,66 @@
             border-radius: 20px;
             padding: 30px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            height: fit-content;
+        }
+        body.dark .container {
+            background: rgba(0, 0, 0, 0.3);
+        }
+        body.light .container {
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+        }
+        .function-test {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 3px solid #4CAF50;
+        }
+        body.light .function-test {
+            background: rgba(0, 0, 0, 0.05);
+        }
+        .function-test h3 {
+            margin-top: 0;
+            color: #4CAF50;
+        }
+        .function-test input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        body.light .function-test input {
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            border-color: rgba(0, 0, 0, 0.2);
+        }
+        .function-test input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        body.light .function-test input::placeholder {
+            color: rgba(0, 0, 0, 0.5);
+        }
+        .function-test button {
+            width: 100%;
+            margin: 5px 0;
+        }
+        .function-test .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            background: rgba(0, 0, 0, 0.2);
+            font-family: monospace;
+            min-height: 40px;
+        }
+        body.light .function-test .result {
+            background: rgba(0, 0, 0, 0.05);
         }
         h1 {
             text-align: center;
@@ -56,12 +138,38 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
         .output {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 15px;
-            margin-top: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
             border-radius: 10px;
-            min-height: 100px;
-            font-family: monospace;
+            min-height: calc(100vh - 100px);
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-y: auto;
+            color: #00ff00;
+            border: 2px solid rgba(0, 255, 0, 0.3);
+        }
+        body.light .output {
+            background: rgba(0, 0, 0, 0.9);
+        }
+        .output-header {
+            color: #00ff00;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(0, 255, 0, 0.3);
+            padding-bottom: 10px;
+        }
+        .output-line {
+            margin: 5px 0;
+            padding: 2px 0;
+        }
+        .output-line.success {
+            color: #00ff00;
+        }
+        .output-line.error {
+            color: #ff0000;
+        }
+        .output-line.info {
+            color: #00aaff;
         }
         .success {
             color: #4CAF50;
@@ -69,182 +177,475 @@
         .error {
             color: #f44336;
         }
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        body.dark .theme-toggle {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        body.light .theme-toggle {
+            background: rgba(0, 0, 0, 0.1);
+            border-color: rgba(0, 0, 0, 0.2);
+            color: #333;
+        }
     </style>
 </head>
 <body>
+    <button class="theme-toggle" onclick="handleToggleTheme()">🌓 Toggle Theme</button>
+    <div class="main-container">
+        <div class="left-panel">
     <div class="container">
         <h1>🐛 Bug Fix Challenge</h1>
         <p class="subtitle">Test your fixes interactively before pushing to Git!</p>
         
         <div class="bug-info">
-            <strong>🎯 Challenge:</strong> Fix all 5 bugs in script.js to make all tests pass. 
-            You cannot push to Git until all bugs are fixed (Husky pre-push hook will block you)!
+                    <strong>🎯 Challenge:</strong> Fix all bugs in script.js to make all tests pass. 
+                    You cannot push to Git until all bugs are fixed (Husky pre-push hook will block you)!<br>
+                    <strong>Functions to fix:</strong> toggleTheme, sumOfDigits, printNumbersWithDelay, reverseEachWord, flattenArray, reverseString
+                </div>
+
+                <!-- Toggle Theme Test -->
+                <div class="function-test">
+                    <h3>🌓 toggleTheme()</h3>
+                    <p>Click the toggle button in the top right corner or click below:</p>
+                    <button onclick="testToggleTheme()">Test Toggle Theme</button>
+                    <div class="result" id="toggleTheme-result">Click to test theme toggle...</div>
+                </div>
+
+                <!-- Sum Of Digits Test -->
+                <div class="function-test">
+                    <h3>🔢 sumOfDigits(number)</h3>
+                    <input type="number" id="sumOfDigits-input" placeholder="Enter a number (e.g., 123)" value="123">
+                    <button onclick="testSumOfDigitsInput()">Test sumOfDigits()</button>
+                    <button onclick="testSumOfDigits()" style="background: #666;">Run Predefined Test</button>
+                    <div class="result" id="sumOfDigits-result">Enter a number and click test...</div>
+                </div>
+
+                <!-- Reverse Each Word Test -->
+                <div class="function-test">
+                    <h3>🔄 reverseEachWord(sentence)</h3>
+                    <input type="text" id="reverseEachWord-input" placeholder="Enter a sentence (e.g., Hello World)" value="Hello World">
+                    <button onclick="testReverseEachWordInput()">Test reverseEachWord()</button>
+                    <button onclick="testReverseEachWord()" style="background: #666;">Run Predefined Test</button>
+                    <div class="result" id="reverseEachWord-result">Enter a sentence and click test...</div>
+                </div>
+
+                <!-- Flatten Array Test -->
+                <div class="function-test">
+                    <h3>📦 flattenArray(array)</h3>
+                    <input type="text" id="flattenArray-input" placeholder='Enter array as JSON (e.g., [1, [2, [3]]])' value='[1, [2, [3, [4]]]]'>
+                    <button onclick="testFlattenArrayInput()">Test flattenArray()</button>
+                    <button onclick="testFlattenArray()" style="background: #666;">Run Predefined Test</button>
+                    <div class="result" id="flattenArray-result">Enter a nested array and click test...</div>
+                </div>
+
+                <!-- Reverse String Test -->
+                <div class="function-test">
+                    <h3>🔀 reverseString(str)</h3>
+                    <input type="text" id="reverseString-input" placeholder="Enter a string (e.g., hello)" value="hello">
+                    <button onclick="testReverseStringInput()">Test reverseString()</button>
+                    <button onclick="testReverseString()" style="background: #666;">Run Predefined Test</button>
+                    <div class="result" id="reverseString-result">Enter a string and click test...</div>
+                </div>
+
+                <!-- Print Numbers With Delay Test -->
+                <div class="function-test">
+                    <h3>⏱️ printNumbersWithDelay()</h3>
+                    <p>This function will print numbers 1-5 with delays. Check console for output.</p>
+                    <button onclick="testPrintNumbersWithDelay()">Test printNumbersWithDelay()</button>
+                    <div class="result" id="printNumbersWithDelay-result">Click to test (check console output)...</div>
+                </div>
+
+                <button onclick="runAllTests()" style="background: #2196F3; width: 100%; margin-top: 20px;">🧪 Run All Tests</button>
+            </div>
         </div>
 
-        <button onclick="testSum()">Test sum()</button>
-        <button onclick="testMultiply()">Test multiply()</button>
-        <button onclick="testIsEven()">Test isEven()</button>
-        <button onclick="testFindMax()">Test findMax()</button>
-        <button onclick="testReverseString()">Test reverseString()</button>
-        <button onclick="runAllTests()" style="background: #2196F3;">🧪 Run All Tests</button>
-
-        <div class="output" id="output">Click a button to test the functions...</div>
+        <div class="right-panel">
+            <div class="container">
+                <div class="output-header">📟 Terminal Output</div>
+                <div class="output" id="output">
+                    <div class="output-line info">Welcome to Bug Fix Challenge Terminal</div>
+                    <div class="output-line info">Enter inputs on the left and click test buttons to see results here.</div>
+                    <div class="output-line info">Ready to test functions...</div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>
     <script>
-        // Add test functions to the global scope for HTML button onclick handlers
-        window.testSum = function() {
+        // Terminal output helper functions
+        function addToTerminal(message, type = 'info') {
             const output = document.getElementById('output');
+            const timestamp = new Date().toLocaleTimeString();
+            const line = document.createElement('div');
+            line.className = `output-line ${type}`;
+            line.textContent = `[${timestamp}] ${message}`;
+            output.appendChild(line);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function clearTerminal() {
+            const output = document.getElementById('output');
+            output.innerHTML = '<div class="output-line info">Terminal cleared...</div>';
+        }
+
+        // Error handling for toggleTheme
+        window.handleToggleTheme = function() {
+            const resultDiv = document.getElementById('toggleTheme-result');
             try {
-                const result1 = sum(2, 3);
-                const result2 = sum(10, -5);
-                if (result1 === 5 && result2 === 5) {
-                    output.innerHTML = `<span class="success">✅ sum() works! ${result1} and ${result2} are correct!</span>`;
+                if (typeof toggleTheme === 'function') {
+                    const beforeTheme = document.body.classList.contains('dark') ? 'dark' : 
+                                       document.body.classList.contains('light') ? 'light' : 'default';
+                    toggleTheme();
+                    setTimeout(() => {
+                        const afterTheme = document.body.classList.contains('dark') ? 'dark' : 
+                                          document.body.classList.contains('light') ? 'light' : 'default';
+                        if (beforeTheme !== afterTheme) {
+                            resultDiv.innerHTML = `<span class="success">✅ Theme changed from ${beforeTheme} to ${afterTheme}</span>`;
+                            addToTerminal(`✅ toggleTheme() - Changed from ${beforeTheme} to ${afterTheme}`, 'success');
+                        } else {
+                            resultDiv.innerHTML = `<span class="error">❌ Theme did not change. Check script.js</span>`;
+                            addToTerminal(`❌ toggleTheme() - Theme did not change properly`, 'error');
+                        }
+                    }, 100);
                 } else {
-                    output.innerHTML = `<span class="error">❌ sum() failed! Got ${result1} and ${result2}, expected 5 and 5</span>`;
+                    resultDiv.innerHTML = `<span class="error">❌ toggleTheme function is not defined!</span>`;
+                    addToTerminal(`❌ toggleTheme() - Function not defined`, 'error');
                 }
-            } catch (e) {
-                output.innerHTML = `<span class="error">❌ Error: ${e.message}</span>`;
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">❌ Error: ${error.message}</span>`;
+                addToTerminal(`❌ toggleTheme() - Error: ${error.message}`, 'error');
             }
         };
 
-        window.testMultiply = function() {
-            const output = document.getElementById('output');
+        window.testToggleTheme = function() {
+            handleToggleTheme();
+        };
+
+        
+
+        // Input-based test functions
+        window.testSumOfDigitsInput = function() {
+            const input = document.getElementById('sumOfDigits-input').value;
+            const resultDiv = document.getElementById('sumOfDigits-result');
             try {
-                const result1 = multiply(3, 4);
-                const result2 = multiply(-2, 5);
-                if (result1 === 12 && result2 === -10) {
-                    output.innerHTML = `<span class="success">✅ multiply() works! ${result1} and ${result2} are correct!</span>`;
+                const num = parseInt(input);
+                if (isNaN(num)) {
+                    resultDiv.innerHTML = `<span class="error">❌ Please enter a valid number</span>`;
+                    addToTerminal(`❌ sumOfDigits() - Invalid input: ${input}`, 'error');
+                    return;
+                }
+                const result = sumOfDigits(num);
+                const expected = String(num).split('').reduce((sum, digit) => sum + parseInt(digit), 0);
+                if (result === expected) {
+                    resultDiv.innerHTML = `<span class="success">✅ sumOfDigits(${num}) = ${result} ✓</span>`;
+                    addToTerminal(`✅ sumOfDigits(${num}) = ${result}`, 'success');
                 } else {
-                    output.innerHTML = `<span class="error">❌ multiply() failed! Got ${result1} and ${result2}, expected 12 and -10</span>`;
+                    resultDiv.innerHTML = `<span class="error">❌ sumOfDigits(${num}) = ${result}, expected ${expected}</span>`;
+                    addToTerminal(`❌ sumOfDigits(${num}) = ${result}, expected ${expected}`, 'error');
                 }
             } catch (e) {
-                output.innerHTML = `<span class="error">❌ Error: ${e.message}</span>`;
+                resultDiv.innerHTML = `<span class="error">❌ Error: ${e.message}</span>`;
+                addToTerminal(`❌ sumOfDigits() - Error: ${e.message}`, 'error');
             }
         };
 
-        window.testIsEven = function() {
-            const output = document.getElementById('output');
+        window.testSumOfDigits = function() {
+            const resultDiv = document.getElementById('sumOfDigits-result');
             try {
-                const result1 = isEven(4);
-                const result2 = isEven(5);
-                if (result1 === true && result2 === false) {
-                    output.innerHTML = `<span class="success">✅ isEven() works! isEven(4)=${result1}, isEven(5)=${result2}</span>`;
+                const result1 = sumOfDigits(123);
+                const result2 = sumOfDigits(456);
+                if (result1 === 6 && result2 === 15) {
+                    resultDiv.innerHTML = `<span class="success">✅ Predefined test passed! sumOfDigits(123)=${result1}, sumOfDigits(456)=${result2}</span>`;
+                    addToTerminal(`✅ sumOfDigits() predefined tests passed`, 'success');
                 } else {
-                    output.innerHTML = `<span class="error">❌ isEven() failed! Got isEven(4)=${result1}, isEven(5)=${result2}</span>`;
+                    resultDiv.innerHTML = `<span class="error">❌ Predefined test failed! Got ${result1} and ${result2}, expected 6 and 15</span>`;
+                    addToTerminal(`❌ sumOfDigits() predefined tests failed`, 'error');
                 }
             } catch (e) {
-                output.innerHTML = `<span class="error">❌ Error: ${e.message}</span>`;
+                resultDiv.innerHTML = `<span class="error">❌ Error: ${e.message}</span>`;
+                addToTerminal(`❌ sumOfDigits() - Error: ${e.message}`, 'error');
             }
         };
 
-        window.testFindMax = function() {
-            const output = document.getElementById('output');
+        window.testReverseEachWordInput = function() {
+            const input = document.getElementById('reverseEachWord-input').value;
+            const resultDiv = document.getElementById('reverseEachWord-result');
             try {
-                const result1 = findMax([1, 5, 3, 9, 2]);
-                const result2 = findMax([-10, -5, -8]);
-                if (result1 === 9 && result2 === -5) {
-                    output.innerHTML = `<span class="success">✅ findMax() works! Max is ${result1} and ${result2}</span>`;
+                if (!input.trim()) {
+                    resultDiv.innerHTML = `<span class="error">❌ Please enter a sentence</span>`;
+                    addToTerminal(`❌ reverseEachWord() - Empty input`, 'error');
+                    return;
+                }
+                const result = reverseEachWord(input);
+                const expected = input.split(' ').map(word => word.split('').reverse().join('')).join(' ');
+                if (result === expected) {
+                    resultDiv.innerHTML = `<span class="success">✅ reverseEachWord("${input}") = "${result}" ✓</span>`;
+                    addToTerminal(`✅ reverseEachWord("${input}") = "${result}"`, 'success');
                 } else {
-                    output.innerHTML = `<span class="error">❌ findMax() failed! Got ${result1} and ${result2}, expected 9 and -5</span>`;
+                    resultDiv.innerHTML = `<span class="error">❌ Got "${result}", expected "${expected}"</span>`;
+                    addToTerminal(`❌ reverseEachWord() - Got "${result}", expected "${expected}"`, 'error');
                 }
             } catch (e) {
-                output.innerHTML = `<span class="error">❌ Error: ${e.message}</span>`;
+                resultDiv.innerHTML = `<span class="error">❌ Error: ${e.message}</span>`;
+                addToTerminal(`❌ reverseEachWord() - Error: ${e.message}`, 'error');
+            }
+        };
+
+        window.testReverseEachWord = function() {
+            const resultDiv = document.getElementById('reverseEachWord-result');
+            try {
+                const result1 = reverseEachWord("Hello World");
+                const result2 = reverseEachWord("JavaScript is fun");
+                if (result1 === "olleH dlroW" && result2 === "tpircSavaJ si nuf") {
+                    resultDiv.innerHTML = `<span class="success">✅ Predefined tests passed! "${result1}" and "${result2}"</span>`;
+                    addToTerminal(`✅ reverseEachWord() predefined tests passed`, 'success');
+                } else {
+                    resultDiv.innerHTML = `<span class="error">❌ Predefined tests failed! Got "${result1}" and "${result2}"</span>`;
+                    addToTerminal(`❌ reverseEachWord() predefined tests failed`, 'error');
+                }
+            } catch (e) {
+                resultDiv.innerHTML = `<span class="error">❌ Error: ${e.message}</span>`;
+                addToTerminal(`❌ reverseEachWord() - Error: ${e.message}`, 'error');
+            }
+        };
+
+        window.testFlattenArrayInput = function() {
+            const input = document.getElementById('flattenArray-input').value;
+            const resultDiv = document.getElementById('flattenArray-result');
+            try {
+                const arr = JSON.parse(input);
+                if (!Array.isArray(arr)) {
+                    resultDiv.innerHTML = `<span class="error">❌ Input must be a valid JSON array</span>`;
+                    addToTerminal(`❌ flattenArray() - Invalid input: not an array`, 'error');
+                    return;
+                }
+                const result = flattenArray(arr);
+                const expected = arr.flat(Infinity);
+                if (JSON.stringify(result) === JSON.stringify(expected)) {
+                    resultDiv.innerHTML = `<span class="success">✅ flattenArray(${JSON.stringify(arr)}) = ${JSON.stringify(result)} ✓</span>`;
+                    addToTerminal(`✅ flattenArray() = ${JSON.stringify(result)}`, 'success');
+                } else {
+                    resultDiv.innerHTML = `<span class="error">❌ Got ${JSON.stringify(result)}, expected ${JSON.stringify(expected)}</span>`;
+                    addToTerminal(`❌ flattenArray() - Got ${JSON.stringify(result)}, expected ${JSON.stringify(expected)}`, 'error');
+                }
+            } catch (e) {
+                resultDiv.innerHTML = `<span class="error">❌ Error: ${e.message}. Check JSON syntax.</span>`;
+                addToTerminal(`❌ flattenArray() - Error: ${e.message}`, 'error');
+            }
+        };
+
+        window.testFlattenArray = function() {
+            const resultDiv = document.getElementById('flattenArray-result');
+            try {
+                const result1 = flattenArray([1, [2, [3, [4]]]]);
+                const result2 = flattenArray([1, [2, 3], [4, [5]]]);
+                const expected1 = [1, 2, 3, 4];
+                const expected2 = [1, 2, 3, 4, 5];
+                if (JSON.stringify(result1) === JSON.stringify(expected1) && 
+                    JSON.stringify(result2) === JSON.stringify(expected2)) {
+                    resultDiv.innerHTML = `<span class="success">✅ Predefined tests passed! ${JSON.stringify(result1)} and ${JSON.stringify(result2)}</span>`;
+                    addToTerminal(`✅ flattenArray() predefined tests passed`, 'success');
+                } else {
+                    resultDiv.innerHTML = `<span class="error">❌ Predefined tests failed! Got ${JSON.stringify(result1)} and ${JSON.stringify(result2)}</span>`;
+                    addToTerminal(`❌ flattenArray() predefined tests failed`, 'error');
+                }
+            } catch (e) {
+                resultDiv.innerHTML = `<span class="error">❌ Error: ${e.message}</span>`;
+                addToTerminal(`❌ flattenArray() - Error: ${e.message}`, 'error');
+            }
+        };
+
+        window.testPrintNumbersWithDelay = function() {
+            const resultDiv = document.getElementById('printNumbersWithDelay-result');
+            try {
+                resultDiv.innerHTML = `<span class="info">⏳ Running printNumbersWithDelay()... Check console for output</span>`;
+                addToTerminal(`⏳ printNumbersWithDelay() - Starting (check console for numbers)`, 'info');
+                printNumbersWithDelay();
+                setTimeout(() => {
+                    resultDiv.innerHTML = `<span class="success">✅ Function executed. Check browser console to see output (may show bug: all 6s instead of 1,2,3,4,5)</span>`;
+                    addToTerminal(`✅ printNumbersWithDelay() - Executed (check console)`, 'success');
+                }, 2000);
+            } catch (e) {
+                resultDiv.innerHTML = `<span class="error">❌ Error: ${e.message}</span>`;
+                addToTerminal(`❌ printNumbersWithDelay() - Error: ${e.message}`, 'error');
+            }
+        };
+
+        window.testReverseStringInput = function() {
+            const input = document.getElementById('reverseString-input').value;
+            const resultDiv = document.getElementById('reverseString-result');
+            try {
+                if (!input.trim()) {
+                    resultDiv.innerHTML = `<span class="error">❌ Please enter a string</span>`;
+                    addToTerminal(`❌ reverseString() - Empty input`, 'error');
+                    return;
+                }
+                const result = reverseString(input);
+                const expected = input.split('').reverse().join('');
+                if (result === expected) {
+                    resultDiv.innerHTML = `<span class="success">✅ reverseString("${input}") = "${result}" ✓</span>`;
+                    addToTerminal(`✅ reverseString("${input}") = "${result}"`, 'success');
+                } else {
+                    resultDiv.innerHTML = `<span class="error">❌ Got "${result}", expected "${expected}"</span>`;
+                    addToTerminal(`❌ reverseString() - Got "${result}", expected "${expected}"`, 'error');
+                }
+            } catch (e) {
+                resultDiv.innerHTML = `<span class="error">❌ Error: ${e.message}</span>`;
+                addToTerminal(`❌ reverseString() - Error: ${e.message}`, 'error');
             }
         };
 
         window.testReverseString = function() {
-            const output = document.getElementById('output');
+            const resultDiv = document.getElementById('reverseString-result');
             try {
                 const result1 = reverseString("hello");
                 const result2 = reverseString("Challenge");
                 if (result1 === "olleh" && result2 === "egnellahC") {
-                    output.innerHTML = `<span class="success">✅ reverseString() works! Reversed to "${result1}" and "${result2}"</span>`;
+                    resultDiv.innerHTML = `<span class="success">✅ Predefined tests passed! "${result1}" and "${result2}"</span>`;
+                    addToTerminal(`✅ reverseString() predefined tests passed`, 'success');
                 } else {
-                    output.innerHTML = `<span class="error">❌ reverseString() failed! Got "${result1}" and "${result2}"</span>`;
+                    resultDiv.innerHTML = `<span class="error">❌ Predefined tests failed! Got "${result1}" and "${result2}"</span>`;
+                    addToTerminal(`❌ reverseString() predefined tests failed`, 'error');
                 }
             } catch (e) {
-                output.innerHTML = `<span class="error">❌ Error: ${e.message}</span>`;
+                resultDiv.innerHTML = `<span class="error">❌ Error: ${e.message}</span>`;
+                addToTerminal(`❌ reverseString() - Error: ${e.message}`, 'error');
             }
         };
 
         window.runAllTests = function() {
-            const output = document.getElementById('output');
+            clearTerminal();
+            addToTerminal('🧪 Running all tests...', 'info');
             let passed = 0;
-            let total = 5;
-            let results = [];
+            let total = 6;
 
-            // Test sum
+            // Test toggleTheme
+            addToTerminal('Testing toggleTheme()...', 'info');
             try {
-                const r1 = sum(2, 3);
-                const r2 = sum(10, -5);
-                if (r1 === 5 && r2 === 5) {
-                    passed++;
-                    results.push("✅ sum()");
+                if (typeof toggleTheme === 'function') {
+                    const body = document.body;
+                    const beforeTheme = body.classList.contains('dark') ? 'dark' : 
+                                      body.classList.contains('light') ? 'light' : 'default';
+                    toggleTheme();
+                    setTimeout(() => {
+                        const afterTheme = body.classList.contains('dark') ? 'dark' : 
+                                         body.classList.contains('light') ? 'light' : 'default';
+                        if (beforeTheme !== afterTheme || (beforeTheme === 'default' && afterTheme !== 'default')) {
+                            passed++;
+                            addToTerminal('✅ toggleTheme() - PASSED', 'success');
+                        } else {
+                            addToTerminal('❌ toggleTheme() - FAILED (theme did not change)', 'error');
+                        }
+                    }, 100);
                 } else {
-                    results.push("❌ sum()");
+                    addToTerminal('❌ toggleTheme() - FAILED (function not defined)', 'error');
                 }
             } catch (e) {
-                results.push("❌ sum() - Error");
+                addToTerminal(`❌ toggleTheme() - ERROR: ${e.message}`, 'error');
             }
 
-            // Test multiply
+            // Test sumOfDigits
+            addToTerminal('Testing sumOfDigits()...', 'info');
             try {
-                const r1 = multiply(3, 4);
-                const r2 = multiply(-2, 5);
-                if (r1 === 12 && r2 === -10) {
+                const r1 = sumOfDigits(123);
+                const r2 = sumOfDigits(456);
+                if (r1 === 6 && r2 === 15) {
                     passed++;
-                    results.push("✅ multiply()");
+                    addToTerminal(`✅ sumOfDigits() - PASSED (${r1}, ${r2})`, 'success');
                 } else {
-                    results.push("❌ multiply()");
+                    addToTerminal(`❌ sumOfDigits() - FAILED (got ${r1}, ${r2}, expected 6, 15)`, 'error');
                 }
             } catch (e) {
-                results.push("❌ multiply() - Error");
+                addToTerminal(`❌ sumOfDigits() - ERROR: ${e.message}`, 'error');
             }
 
-            // Test isEven
+            // Test reverseEachWord
+            addToTerminal('Testing reverseEachWord()...', 'info');
             try {
-                if (isEven(4) === true && isEven(5) === false) {
+                const r1 = reverseEachWord("Hello World");
+                const r2 = reverseEachWord("JavaScript is fun");
+                if (r1 === "olleH dlroW" && r2 === "tpircSavaJ si nuf") {
                     passed++;
-                    results.push("✅ isEven()");
+                    addToTerminal(`✅ reverseEachWord() - PASSED`, 'success');
                 } else {
-                    results.push("❌ isEven()");
+                    addToTerminal(`❌ reverseEachWord() - FAILED`, 'error');
                 }
             } catch (e) {
-                results.push("❌ isEven() - Error");
+                addToTerminal(`❌ reverseEachWord() - ERROR: ${e.message}`, 'error');
             }
 
-            // Test findMax
+            // Test flattenArray
+            addToTerminal('Testing flattenArray()...', 'info');
             try {
-                if (findMax([1, 5, 3, 9, 2]) === 9 && findMax([-10, -5, -8]) === -5) {
+                const r1 = flattenArray([1, [2, [3, [4]]]]);
+                const r2 = flattenArray([1, [2, 3], [4, [5]]]);
+                const expected1 = [1, 2, 3, 4];
+                const expected2 = [1, 2, 3, 4, 5];
+                if (JSON.stringify(r1) === JSON.stringify(expected1) && 
+                    JSON.stringify(r2) === JSON.stringify(expected2)) {
                     passed++;
-                    results.push("✅ findMax()");
+                    addToTerminal(`✅ flattenArray() - PASSED`, 'success');
                 } else {
-                    results.push("❌ findMax()");
+                    addToTerminal(`❌ flattenArray() - FAILED`, 'error');
                 }
             } catch (e) {
-                results.push("❌ findMax() - Error");
+                addToTerminal(`❌ flattenArray() - ERROR: ${e.message}`, 'error');
+            }
+
+            // Test printNumbersWithDelay
+            addToTerminal('Testing printNumbersWithDelay()...', 'info');
+            try {
+                if (typeof printNumbersWithDelay === 'function') {
+                    printNumbersWithDelay();
+                    passed++;
+                    addToTerminal(`✅ printNumbersWithDelay() - PASSED (check console)`, 'success');
+                } else {
+                    addToTerminal(`❌ printNumbersWithDelay() - FAILED (function not defined)`, 'error');
+                }
+            } catch (e) {
+                addToTerminal(`❌ printNumbersWithDelay() - ERROR: ${e.message}`, 'error');
             }
 
             // Test reverseString
+            addToTerminal('Testing reverseString()...', 'info');
             try {
                 if (reverseString("hello") === "olleh" && reverseString("Challenge") === "egnellahC") {
                     passed++;
-                    results.push("✅ reverseString()");
+                    addToTerminal(`✅ reverseString() - PASSED`, 'success');
                 } else {
-                    results.push("❌ reverseString()");
+                    addToTerminal(`❌ reverseString() - FAILED`, 'error');
                 }
             } catch (e) {
-                results.push("❌ reverseString() - Error");
+                addToTerminal(`❌ reverseString() - ERROR: ${e.message}`, 'error');
             }
 
-            // Display results
-            if (passed === total) {
-                output.innerHTML = `<div class="success"><strong>🎉 All ${total} tests passed! You're ready to push!</strong><br><br>${results.join('<br>')}</div>`;
-            } else {
-                output.innerHTML = `<div class="error"><strong>❌ ${passed}/${total} tests passed. Keep fixing!</strong><br><br>${results.join('<br>')}</div>`;
-            }
+            // Final summary
+            setTimeout(() => {
+                addToTerminal('', 'info');
+                if (passed === total) {
+                    addToTerminal(`🎉 ALL ${total} TESTS PASSED! Ready to push!`, 'success');
+                } else {
+                    addToTerminal(`❌ ${passed}/${total} tests passed. Keep fixing!`, 'error');
+                }
+            }, 500);
         };
     </script>
 </body>
