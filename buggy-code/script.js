@@ -11,11 +11,9 @@
 function toggleTheme() {
   const body = document.body;
   if (body.classList.contains("dark")) {
-    body.classList.remove("dark");
-    body.classList.add("light");
+    body.classList.remove("dark"); // missing logic bug: the body element becomes undefined
   } else {
     body.classList.remove("light");
-    body.classList.add("dark");
   }
 }
 
@@ -40,7 +38,7 @@ async function submitWithLogId(data) {
   
   // Bug: Trying to return logId before it exists - logId is only available after awaiting the promise
   // This will cause ReferenceError: logId is not defined
-  return await logPromise;
+  return logPromise;
 }
 
 // ============================================================================
@@ -48,12 +46,7 @@ async function submitWithLogId(data) {
 // ============================================================================
 // 🐞 Bug: returns only last digit
 function sumOfDigits(num) {
-  let sum = 0;
-  while (num > 0) {
-    sum += num % 10;
-    num = Math.floor(num / 10);
-  } 
-  return sum;
+  return num % 10;
 }
 // Example: 123 → 6
 
@@ -65,9 +58,7 @@ function sumOfDigits(num) {
 
 function printNumbersWithDelay() {
   for (var i = 1; i <= 5; i++) {
-    (function(j) {
-      setTimeout(() => console.log(j), 1000 * j); // 1000 * j is the delay in milliseconds
-    })(i);
+      setTimeout(() => console.log(i), 1000 * i);;  // bug here incomplete logic
   }
 }
 
@@ -82,9 +73,7 @@ function reverseEachWord(sentence) {
     return '';
   } else {
     return sentence
-      .split(' ')
-      .map(word => word.split('').reverse().join(''))
-      .join(' ');
+      .split(' '); // bug here incomplete logic
   }
 }
 
@@ -95,7 +84,7 @@ function reverseEachWord(sentence) {
 // [1, [2, [3, [4]]]] → [1,2,3,4]
 
 function flattenArray(arr) {
-  return arr.flat(Infinity);
+  return arr; //use inbuilt functions of array no need to write new logic
 }
 
 
@@ -104,7 +93,7 @@ function flattenArray(arr) {
 // Q6: Fetch Data from API Endpoints
 // ============================================================================
 // 🧠 Trick: Remember to await promises!
-// 🐞 Bug: Missing await keywords - fetch() returns a Promise that must be awaited before calling .json()
+// 🐞 Bug 
 // Fix the async function to properly fetch and parse JSON data from multiple endpoints.
 // The function should fetch data from each URL in the array sequentially, then fetch a single post.
 // Currently, it tries to call .json() on a Promise object instead of a Response, which will cause errors.
@@ -112,14 +101,14 @@ function flattenArray(arr) {
 const urls = ["users", "posts", "comments"];
 
 async function getData() {
-  for (let i = 0; i < urls.length; i++) {
-    const res = await fetch(`https://jsonplaceholder.typicode.com/${urls[i]}`);
+  for (var i = 0; i < urls.length; i++) {
+    const res = fetch(`https://jsonplaceholder.typicode.com/${urls[i]}`);
     const data = await res.json();
     console.log(`Data for ${urls[i]}:`, data.length);
   }
 
   try {
-    const res = await fetch("https://jsonplaceholder.typicode.com/posts/1");
+    const res = fetch("https://jsonplaceholder.typicode.com/posts/1");
     const data = await res.json();
     console.log("Single Post:", data);
   } catch (err) {
