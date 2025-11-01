@@ -1,4 +1,4 @@
-const { toggleTheme, sumOfDigits, printNumbersWithDelay, reverseEachWord, flattenArray, reverseString } = require('../buggy-code/script');
+const { toggleTheme, sumOfDigits, printNumbersWithDelay, reverseEachWord, flattenArray, getData } = require('../buggy-code/script');
 
 describe('Bug Fix Challenge - All Tests Must Pass!', () => {
   
@@ -193,55 +193,124 @@ describe('Bug Fix Challenge - All Tests Must Pass!', () => {
     });
   });
 
-  describe('reverseString() function', () => {
-    test('should reverse a simple string', () => {
-      expect(reverseString('hello')).toBe('olleh');
-      expect(reverseString('world')).toBe('dlrow');
-      expect(reverseString('test')).toBe('tset');
+  describe('getData() function', () => {
+    let originalFetch;
+    let consoleSpy;
+
+    beforeEach(() => {
+      // Save original fetch if it exists
+      originalFetch = global.fetch;
+      // Mock console.log and console.error
+      consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+      jest.spyOn(console, 'error').mockImplementation();
     });
 
-    test('should handle strings with different cases', () => {
-      expect(reverseString('Challenge')).toBe('egnellahC');
-      expect(reverseString('JavaScript')).toBe('tpircSavaJ');
-      expect(reverseString('HeLLoWoRLd')).toBe('dLRoWoLLeH');
+    afterEach(() => {
+      // Restore original fetch
+      global.fetch = originalFetch;
+      // Restore console methods
+      consoleSpy.mockRestore();
+      jest.restoreAllMocks();
     });
 
-    test('should handle single character strings', () => {
-      expect(reverseString('a')).toBe('a');
-      expect(reverseString('Z')).toBe('Z');
-      expect(reverseString('1')).toBe('1');
+    test('should be defined', () => {
+      expect(typeof getData).toBe('function');
     });
 
-    test('should handle empty strings', () => {
-      expect(reverseString('')).toBe('');
+    test('should fetch data from all endpoints sequentially', async () => {
+      // Mock fetch to return mock responses
+      const mockUsers = [{ id: 1, name: 'John' }, { id: 2, name: 'Jane' }];
+      const mockPosts = [{ id: 1, title: 'Post 1' }, { id: 2, title: 'Post 2' }];
+      const mockComments = [{ id: 1, body: 'Comment 1' }];
+      const mockSinglePost = { id: 1, title: 'Single Post', body: 'Body' };
+
+      global.fetch = jest.fn()
+        .mockResolvedValueOnce({
+          json: async () => mockUsers,
+          ok: true,
+          status: 200
+        })
+        .mockResolvedValueOnce({
+          json: async () => mockPosts,
+          ok: true,
+          status: 200
+        })
+        .mockResolvedValueOnce({
+          json: async () => mockComments,
+          ok: true,
+          status: 200
+        })
+        .mockResolvedValueOnce({
+          json: async () => mockSinglePost,
+          ok: true,
+          status: 200
+        });
+
+      await getData();
+
+      // Check that fetch was called 4 times (3 for array endpoints + 1 for single post)
+      expect(global.fetch).toHaveBeenCalledTimes(4);
+      expect(global.fetch).toHaveBeenCalledWith('https://jsonplaceholder.typicode.com/users');
+      expect(global.fetch).toHaveBeenCalledWith('https://jsonplaceholder.typicode.com/posts');
+      expect(global.fetch).toHaveBeenCalledWith('https://jsonplaceholder.typicode.com/comments');
+      expect(global.fetch).toHaveBeenCalledWith('https://jsonplaceholder.typicode.com/posts/1');
+
+      // Check that console.log was called for each endpoint
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Data for users:'), 2);
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Data for posts:'), 2);
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Data for comments:'), 1);
+      expect(consoleSpy).toHaveBeenCalledWith('Single Post:', mockSinglePost);
     });
 
-    test('should handle strings with spaces', () => {
-      expect(reverseString('hello world')).toBe('dlrow olleh');
-      expect(reverseString('a b c')).toBe('c b a');
+    test('should handle fetch errors gracefully', async () => {
+      const mockError = new Error('Network error');
+      global.fetch = jest.fn()
+        .mockResolvedValueOnce({
+          json: async () => [{ id: 1 }],
+          ok: true,
+          status: 200
+        })
+        .mockResolvedValueOnce({
+          json: async () => [{ id: 1 }],
+          ok: true,
+          status: 200
+        })
+        .mockResolvedValueOnce({
+          json: async () => [{ id: 1 }],
+          ok: true,
+          status: 200
+        })
+        .mockRejectedValueOnce(mockError);
+
+      // Should not throw - errors in try-catch should be caught
+      await expect(getData()).resolves.not.toThrow();
+
+      // console.error should be called for the single post fetch error
+      expect(console.error).toHaveBeenCalled();
     });
 
-    test('should handle strings with special characters', () => {
-      expect(reverseString('hello!')).toBe('!olleh');
-      expect(reverseString('test-case')).toBe('esac-tset');
-      expect(reverseString('a@b#c')).toBe('c#b@a');
-    });
+    test('should await fetch responses before calling json()', async () => {
+      // This test will fail if await is missing before fetch()
+      const mockData = [{ id: 1 }];
+      let fetchCallCount = 0;
 
-    test('should handle strings with numbers', () => {
-      expect(reverseString('123')).toBe('321');
-      expect(reverseString('test123')).toBe('321tset');
-      expect(reverseString('1a2b3c')).toBe('c3b2a1');
-    });
+      global.fetch = jest.fn().mockImplementation(() => {
+        fetchCallCount++;
+        return Promise.resolve({
+          json: async () => {
+            // If fetch() was not awaited, this will throw because res is a Promise
+            expect(fetchCallCount).toBeDefined();
+            return mockData;
+          },
+          ok: true,
+          status: 200
+        });
+      });
 
-    test('should handle strings with unicode characters', () => {
-      expect(reverseString('café')).toBe('éfac');
-      expect(reverseString('こんにちは')).toBe('はちにんこ');
-    });
+      await getData();
 
-    test('should handle palindromes', () => {
-      expect(reverseString('radar')).toBe('radar');
-      expect(reverseString('level')).toBe('level');
-      expect(reverseString('racecar')).toBe('racecar');
+      // If we get here without errors, fetch was properly awaited
+      expect(global.fetch).toHaveBeenCalled();
     });
   });
 
@@ -255,47 +324,42 @@ describe('Bug Fix Challenge - All Tests Must Pass!', () => {
       
       // flattenArray should work
       expect(flattenArray([1, [2, [3]]])).toEqual([1, 2, 3]);
-      
-      // reverseString should work
-      expect(reverseString('test')).toBe('tset');
     });
 
     test('should handle combined operations', () => {
-      // Reverse string then flatten array containing reversed strings
-      const nested = [[reverseString('test')], ['hello']];
-      expect(flattenArray(nested)).toEqual(['tset', 'hello']);
-      
       // Reverse each word in a sentence
       const sentence = reverseEachWord('test hello');
       expect(sentence).toBe('tset olleh');
       
-      // Sum digits of number, then reverse string representation
+      // Sum digits of number
       const num = 123;
       const sum = sumOfDigits(num);
-      const sumString = String(sum);
-      expect(reverseString(sumString)).toBe('6');
+      expect(sum).toBe(6);
+      
+      // Flatten nested arrays
+      const nested = [[['test']], ['hello']];
+      expect(flattenArray(nested)).toEqual(['test', 'hello']);
     });
 
     test('should handle edge case combinations', () => {
       // Empty operations
-      expect(flattenArray([reverseString(''), ''])).toEqual(['', '']);
+      expect(flattenArray([[]])).toEqual([]);
       expect(reverseEachWord('')).toBe('');
       
       // Single element operations
       expect(sumOfDigits(5)).toBe(5);
-      expect(reverseString('a')).toBe('a');
       expect(flattenArray([1])).toEqual([1]);
     });
 
     test('should handle complex nested operations', () => {
-      // Create array with reversed strings
-      const words = ['hello', 'world', 'test'];
-      const reversed = words.map(reverseString);
-      expect(reversed).toEqual(['olleh', 'dlrow', 'tset']);
-      
       // Flatten nested array structure
-      const nested = [[[reversed]]];
-      expect(flattenArray(nested)).toEqual(['olleh', 'dlrow', 'tset']);
+      const nested = [[[['hello', 'world', 'test']]]];
+      expect(flattenArray(nested)).toEqual(['hello', 'world', 'test']);
+      
+      // Reverse words in array and flatten
+      const words = ['hello world', 'test'];
+      const reversed = words.map(reverseEachWord);
+      expect(reversed).toEqual(['olleh dlrow', 'tset']);
     });
   });
 });

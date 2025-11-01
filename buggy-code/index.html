@@ -8,13 +8,14 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 0;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             transition: all 0.3s ease;
             display: flex;
-            gap: 20px;
+            flex-direction: column;
             min-height: 100vh;
+            overflow: hidden;
         }
         body.dark {
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
@@ -26,10 +27,90 @@
         }
         .main-container {
             display: flex;
-            gap: 20px;
+            flex-direction: column;
             width: 100%;
-            max-width: 1400px;
-            margin: 0 auto;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .content-panel {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 30px;
+            padding-bottom: 20px;
+        }
+        @media (min-width: 1200px) {
+            .content-panel {
+                padding-left: calc((100% - 1200px) / 2 + 30px);
+                padding-right: calc((100% - 1200px) / 2 + 30px);
+            }
+        }
+        .terminal-panel {
+            position: relative;
+            height: 300px;
+            min-height: 200px;
+            max-height: 70vh;
+            background: #1e1e1e;
+            border-top: 2px solid rgba(0, 255, 0, 0.4);
+            transition: height 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
+        }
+        body.dark .terminal-panel {
+            background: #1e1e1e;
+        }
+        body.light .terminal-panel {
+            background: #1e1e1e;
+        }
+        .terminal-resize-handle {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: rgba(0, 255, 0, 0.3);
+            cursor: ns-resize;
+            z-index: 10;
+            transition: background 0.2s ease;
+        }
+        .terminal-resize-handle:hover {
+            background: rgba(0, 255, 0, 0.6);
+        }
+        .terminal-header {
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.6);
+            border-bottom: 1px solid rgba(0, 255, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            user-select: none;
+        }
+        .terminal-header-title {
+            color: #00ff00;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        .terminal-toggle-btn {
+            background: transparent;
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            color: #00ff00;
+            padding: 4px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            margin: 0;
+            transition: all 0.2s ease;
+        }
+        .terminal-toggle-btn:hover {
+            background: rgba(0, 255, 0, 0.1);
+        }
+        .terminal-panel.collapsed {
+            height: 40px;
+            overflow: hidden;
+        }
+        .terminal-panel.collapsed .output {
+            display: none;
         }
         .left-panel, .right-panel {
             flex: 1;
@@ -39,47 +120,78 @@
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             border-radius: 20px;
-            padding: 30px;
+            padding: 40px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
             height: fit-content;
+            margin: 0 auto;
+            max-width: 1200px;
         }
         body.dark .container {
             background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         body.light .container {
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             color: #333;
+            border: 1px solid rgba(0, 0, 0, 0.1);
         }
         .function-test {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            padding: 20px;
-            margin: 15px 0;
-            border-left: 3px solid #4CAF50;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 20px 0;
+            border-left: 4px solid #4CAF50;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .function-test:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
         body.light .function-test {
-            background: rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.6);
+            border-left-color: #45a049;
+        }
+        body.dark .function-test {
+            background: rgba(255, 255, 255, 0.05);
         }
         .function-test h3 {
             margin-top: 0;
+            margin-bottom: 12px;
             color: #4CAF50;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+        body.light .function-test h3 {
+            color: #2e7d32;
         }
         .function-test input {
             width: 100%;
-            padding: 10px;
-            margin: 10px 0;
+            padding: 12px 16px;
+            margin: 12px 0;
             border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 8px;
             background: rgba(255, 255, 255, 0.1);
             color: white;
-            font-size: 14px;
+            font-size: 15px;
             box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+        .function-test input:focus {
+            outline: none;
+            border-color: #4CAF50;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
         }
         body.light .function-test input {
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 1);
             color: #333;
             border-color: rgba(0, 0, 0, 0.2);
+        }
+        body.light .function-test input:focus {
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
         }
         .function-test input::placeholder {
             color: rgba(255, 255, 255, 0.6);
@@ -87,76 +199,106 @@
         body.light .function-test input::placeholder {
             color: rgba(0, 0, 0, 0.5);
         }
-        .function-test button {
-            width: 100%;
-            margin: 5px 0;
+        .function-test button:not(.terminal-toggle-btn) {
+            width: auto;
+            min-width: 150px;
         }
         .function-test .result {
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 5px;
+            margin-top: 16px;
+            padding: 14px 16px;
+            border-radius: 8px;
             background: rgba(0, 0, 0, 0.2);
-            font-family: monospace;
-            min-height: 40px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            min-height: 44px;
+            line-height: 1.5;
+            word-wrap: break-word;
         }
         body.light .function-test .result {
-            background: rgba(0, 0, 0, 0.05);
+            background: rgba(0, 0, 0, 0.06);
+            color: #333;
         }
         h1 {
             text-align: center;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            font-size: 2.2em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff 0%, #e0e0e0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        body.light h1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         .subtitle {
             text-align: center;
-            opacity: 0.9;
-            margin-bottom: 30px;
+            opacity: 0.85;
+            margin-bottom: 32px;
+            font-size: 1.1em;
         }
         .bug-info {
-            background: rgba(255, 193, 7, 0.2);
+            background: rgba(255, 193, 7, 0.15);
             border-left: 4px solid #ffc107;
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 5px;
+            padding: 20px;
+            margin: 24px 0;
+            border-radius: 8px;
+            line-height: 1.6;
         }
         .bug-info strong {
             color: #ffc107;
+            font-weight: 600;
+        }
+        body.light .bug-info {
+            background: rgba(255, 193, 7, 0.1);
+        }
+        body.light .bug-info strong {
+            color: #f57c00;
         }
         button {
             background: #4CAF50;
             color: white;
             border: none;
-            padding: 12px 30px;
-            margin: 10px 5px;
-            border-radius: 25px;
+            padding: 12px 24px;
+            margin: 8px 6px 8px 0;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 15px;
+            font-weight: 500;
             transition: all 0.3s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
         button:hover {
             background: #45a049;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .function-test button {
+            width: auto;
+            min-width: 150px;
         }
         .output {
+            flex: 1;
             background: rgba(0, 0, 0, 0.8);
-            padding: 20px;
-            border-radius: 10px;
-            min-height: calc(100vh - 100px);
+            padding: 15px 20px;
             font-family: 'Courier New', monospace;
             font-size: 13px;
             overflow-y: auto;
             color: #00ff00;
-            border: 2px solid rgba(0, 255, 0, 0.3);
+            border: none;
+            margin: 0;
         }
         body.light .output {
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.95);
         }
         .output-header {
-            color: #00ff00;
-            font-weight: bold;
-            margin-bottom: 15px;
-            border-bottom: 1px solid rgba(0, 255, 0, 0.3);
-            padding-bottom: 10px;
+            display: none;
         }
         .output-line {
             margin: 5px 0;
@@ -209,7 +351,7 @@
 <body>
     <button class="theme-toggle" onclick="handleToggleTheme()">🌓 Toggle Theme</button>
     <div class="main-container">
-        <div class="left-panel">
+        <div class="content-panel">
     <div class="container">
         <h1>🐛 Bug Fix Challenge</h1>
         <p class="subtitle">Test your fixes interactively before pushing to Git!</p>
@@ -217,7 +359,7 @@
         <div class="bug-info">
                     <strong>🎯 Challenge:</strong> Fix all bugs in script.js to make all tests pass. 
                     You cannot push to Git until all bugs are fixed (Husky pre-push hook will block you)!<br>
-                    <strong>Functions to fix:</strong> toggleTheme, sumOfDigits, printNumbersWithDelay, reverseEachWord, flattenArray, reverseString
+                    <strong>Functions to fix:</strong> toggleTheme, submitWithLogId, sumOfDigits, printNumbersWithDelay, reverseEachWord, flattenArray, getData
                 </div>
 
                 <!-- Toggle Theme Test -->
@@ -255,15 +397,6 @@
                     <div class="result" id="flattenArray-result">Enter a nested array and click test...</div>
                 </div>
 
-                <!-- Reverse String Test -->
-                <div class="function-test">
-                    <h3>🔀 reverseString(str)</h3>
-                    <input type="text" id="reverseString-input" placeholder="Enter a string (e.g., hello)" value="hello">
-                    <button onclick="testReverseStringInput()">Test reverseString()</button>
-                    <button onclick="testReverseString()" style="background: #666;">Run Predefined Test</button>
-                    <div class="result" id="reverseString-result">Enter a string and click test...</div>
-                </div>
-
                 <!-- Print Numbers With Delay Test -->
                 <div class="function-test">
                     <h3>⏱️ printNumbersWithDelay()</h3>
@@ -272,24 +405,87 @@
                     <div class="result" id="printNumbersWithDelay-result">Click to test (check console output)...</div>
                 </div>
 
+                <!-- Submit with Log ID Test -->
+                <div class="function-test">
+                    <h3>📝 submitWithLogId(data)</h3>
+                    <input type="text" id="submitWithLogId-input" placeholder="Enter data to submit (e.g., user data)" value='{"name": "John", "action": "submit"}'>
+                    <button onclick="testSubmitWithLogIdInput()">Test submitWithLogId()</button>
+                    <button onclick="testSubmitWithLogId()" style="background: #666;">Run Predefined Test</button>
+                    <div class="result" id="submitWithLogId-result">Enter data and click test (check console and terminal output)...</div>
+                </div>
+
+                <!-- Get Data Test -->
+                <div class="function-test">
+                    <h3>🌐 getData()</h3>
+                    <p>Fetches data from multiple API endpoints. Check console for output.</p>
+                    <button onclick="testGetData()">Test getData()</button>
+                    <div class="result" id="getData-result">Click to test (check console and terminal output)...</div>
+                </div>
+
                 <button onclick="runAllTests()" style="background: #2196F3; width: 100%; margin-top: 20px;">🧪 Run All Tests</button>
             </div>
         </div>
 
-        <div class="right-panel">
-            <div class="container">
-                <div class="output-header">📟 Terminal Output</div>
+        <div class="terminal-panel" id="terminalPanel">
+            <div class="terminal-resize-handle" id="terminalResizeHandle"></div>
+            <div class="terminal-header">
+                <div class="terminal-header-title">📟 Terminal</div>
+                <button class="terminal-toggle-btn" id="terminalToggleBtn" onclick="toggleTerminal()">−</button>
+            </div>
                 <div class="output" id="output">
                     <div class="output-line info">Welcome to Bug Fix Challenge Terminal</div>
-                    <div class="output-line info">Enter inputs on the left and click test buttons to see results here.</div>
+                <div class="output-line info">Enter inputs above and click test buttons to see results here.</div>
                     <div class="output-line info">Ready to test functions...</div>
-                </div>
             </div>
         </div>
     </div>
 
     <script src="script.js"></script>
     <script>
+        // Terminal controls
+        function toggleTerminal() {
+            const panel = document.getElementById('terminalPanel');
+            const btn = document.getElementById('terminalToggleBtn');
+            if (panel.classList.contains('collapsed')) {
+                panel.classList.remove('collapsed');
+                btn.textContent = '−';
+            } else {
+                panel.classList.add('collapsed');
+                btn.textContent = '+';
+            }
+        }
+
+        // Terminal resize functionality
+        (function() {
+            const resizeHandle = document.getElementById('terminalResizeHandle');
+            const terminalPanel = document.getElementById('terminalPanel');
+            let isResizing = false;
+            let startY = 0;
+            let startHeight = 0;
+
+            resizeHandle.addEventListener('mousedown', (e) => {
+                isResizing = true;
+                startY = e.clientY;
+                startHeight = terminalPanel.offsetHeight;
+                document.addEventListener('mousemove', handleResize);
+                document.addEventListener('mouseup', stopResize);
+                e.preventDefault();
+            });
+
+            function handleResize(e) {
+                if (!isResizing) return;
+                const deltaY = startY - e.clientY; // Inverted: move up increases height
+                const newHeight = Math.max(200, Math.min(window.innerHeight * 0.7, startHeight + deltaY));
+                terminalPanel.style.height = newHeight + 'px';
+            }
+
+            function stopResize() {
+                isResizing = false;
+                document.removeEventListener('mousemove', handleResize);
+                document.removeEventListener('mouseup', stopResize);
+            }
+        })();
+
         // Terminal output helper functions
         function addToTerminal(message, type = 'info') {
             const output = document.getElementById('output');
@@ -489,53 +685,89 @@
             }
         };
 
-        window.testReverseStringInput = function() {
-            const input = document.getElementById('reverseString-input').value;
-            const resultDiv = document.getElementById('reverseString-result');
+        window.testSubmitWithLogIdInput = async function() {
+            const input = document.getElementById('submitWithLogId-input').value;
+            const resultDiv = document.getElementById('submitWithLogId-result');
             try {
                 if (!input.trim()) {
-                    resultDiv.innerHTML = `<span class="error">❌ Please enter a string</span>`;
-                    addToTerminal(`❌ reverseString() - Empty input`, 'error');
+                    resultDiv.innerHTML = `<span class="error">❌ Please enter data to submit</span>`;
+                    addToTerminal(`❌ submitWithLogId() - Empty input`, 'error');
                     return;
                 }
-                const result = reverseString(input);
-                const expected = input.split('').reverse().join('');
-                if (result === expected) {
-                    resultDiv.innerHTML = `<span class="success">✅ reverseString("${input}") = "${result}" ✓</span>`;
-                    addToTerminal(`✅ reverseString("${input}") = "${result}"`, 'success');
-                } else {
-                    resultDiv.innerHTML = `<span class="error">❌ Got "${result}", expected "${expected}"</span>`;
-                    addToTerminal(`❌ reverseString() - Got "${result}", expected "${expected}"`, 'error');
+                
+                resultDiv.innerHTML = `<span class="info">⏳ Submitting data... Check console and terminal</span>`;
+                addToTerminal(`⏳ submitWithLogId() - Submitting data...`, 'info');
+                
+                // Try to parse as JSON if possible, otherwise use as string
+                let dataToSubmit;
+                try {
+                    dataToSubmit = JSON.parse(input);
+                } catch {
+                    dataToSubmit = input;
                 }
+                
+                const logId = await submitWithLogId(dataToSubmit);
+                
+                // Wait a bit for console logs
+                setTimeout(() => {
+                    resultDiv.innerHTML = `<span class="success">✅ submitWithLogId() executed! Log ID: ${logId}<br>Check browser console to see if logging completed. If logging appears incomplete, the bug is likely missing await.</span>`;
+                    addToTerminal(`✅ submitWithLogId() - Returned Log ID: ${logId}`, 'success');
+                }, 200);
             } catch (e) {
                 resultDiv.innerHTML = `<span class="error">❌ Error: ${e.message}</span>`;
-                addToTerminal(`❌ reverseString() - Error: ${e.message}`, 'error');
+                addToTerminal(`❌ submitWithLogId() - Error: ${e.message}`, 'error');
             }
         };
 
-        window.testReverseString = function() {
-            const resultDiv = document.getElementById('reverseString-result');
+        window.testSubmitWithLogId = async function() {
+            const resultDiv = document.getElementById('submitWithLogId-result');
             try {
-                const result1 = reverseString("hello");
-                const result2 = reverseString("Challenge");
-                if (result1 === "olleh" && result2 === "egnellahC") {
-                    resultDiv.innerHTML = `<span class="success">✅ Predefined tests passed! "${result1}" and "${result2}"</span>`;
-                    addToTerminal(`✅ reverseString() predefined tests passed`, 'success');
-                } else {
-                    resultDiv.innerHTML = `<span class="error">❌ Predefined tests failed! Got "${result1}" and "${result2}"</span>`;
-                    addToTerminal(`❌ reverseString() predefined tests failed`, 'error');
-                }
+                resultDiv.innerHTML = `<span class="info">⏳ Running predefined test...</span>`;
+                addToTerminal(`⏳ submitWithLogId() - Running predefined test...`, 'info');
+                
+                const testData = { name: 'Test User', action: 'submit', timestamp: Date.now() };
+                const logId = await submitWithLogId(testData);
+                
+                setTimeout(() => {
+                    if (logId && logId.startsWith('LOG-')) {
+                        resultDiv.innerHTML = `<span class="success">✅ Predefined test passed! Log ID: ${logId}<br>Check console to verify logging completed properly.</span>`;
+                        addToTerminal(`✅ submitWithLogId() predefined test passed - Log ID: ${logId}`, 'success');
+                    } else {
+                        resultDiv.innerHTML = `<span class="error">❌ Predefined test failed! Expected log ID format LOG-... but got: ${logId}</span>`;
+                        addToTerminal(`❌ submitWithLogId() predefined test failed`, 'error');
+                    }
+                }, 200);
             } catch (e) {
                 resultDiv.innerHTML = `<span class="error">❌ Error: ${e.message}</span>`;
-                addToTerminal(`❌ reverseString() - Error: ${e.message}`, 'error');
+                addToTerminal(`❌ submitWithLogId() - Error: ${e.message}`, 'error');
             }
         };
 
-        window.runAllTests = function() {
+        window.testGetData = async function() {
+            const resultDiv = document.getElementById('getData-result');
+            try {
+                resultDiv.innerHTML = `<span class="info">⏳ Fetching data... Check console and terminal for output</span>`;
+                addToTerminal(`⏳ getData() - Starting fetch operations...`, 'info');
+                
+                await getData();
+                
+                // Wait a bit for console logs to appear
+                setTimeout(() => {
+                    resultDiv.innerHTML = `<span class="success">✅ getData() executed! Check browser console to see fetched data. If you see errors, the bug is likely missing await keywords.</span>`;
+                    addToTerminal(`✅ getData() - Completed (check console for detailed output)`, 'success');
+                }, 2000);
+            } catch (e) {
+                resultDiv.innerHTML = `<span class="error">❌ Error: ${e.message}. Check console for details. This error indicates the bug: missing await before fetch() calls.</span>`;
+                addToTerminal(`❌ getData() - Error: ${e.message}`, 'error');
+                addToTerminal(`💡 Hint: Remember to await promises! fetch() returns a Promise.`, 'info');
+            }
+        };
+
+        window.runAllTests = async function() {
             clearTerminal();
             addToTerminal('🧪 Running all tests...', 'info');
             let passed = 0;
-            let total = 6;
+            let total = 7;
 
             // Test toggleTheme
             addToTerminal('Testing toggleTheme()...', 'info');
@@ -624,17 +856,38 @@
                 addToTerminal(`❌ printNumbersWithDelay() - ERROR: ${e.message}`, 'error');
             }
 
-            // Test reverseString
-            addToTerminal('Testing reverseString()...', 'info');
+            // Test submitWithLogId
+            addToTerminal('Testing submitWithLogId()...', 'info');
             try {
-                if (reverseString("hello") === "olleh" && reverseString("Challenge") === "egnellahC") {
-                    passed++;
-                    addToTerminal(`✅ reverseString() - PASSED`, 'success');
+                if (typeof submitWithLogId === 'function') {
+                    const testData = { name: 'Test', action: 'submit' };
+                    const logId = await submitWithLogId(testData);
+                    if (logId && logId.startsWith('LOG-')) {
+                        passed++;
+                        addToTerminal(`✅ submitWithLogId() - PASSED (Log ID: ${logId})`, 'success');
+                    } else {
+                        addToTerminal(`❌ submitWithLogId() - FAILED (invalid log ID format)`, 'error');
+                    }
                 } else {
-                    addToTerminal(`❌ reverseString() - FAILED`, 'error');
+                    addToTerminal(`❌ submitWithLogId() - FAILED (function not defined)`, 'error');
                 }
             } catch (e) {
-                addToTerminal(`❌ reverseString() - ERROR: ${e.message}`, 'error');
+                addToTerminal(`❌ submitWithLogId() - ERROR: ${e.message}`, 'error');
+            }
+
+            // Test getData
+            addToTerminal('Testing getData()...', 'info');
+            try {
+                if (typeof getData === 'function') {
+                    await getData();
+                    passed++;
+                    addToTerminal(`✅ getData() - PASSED (check console for output)`, 'success');
+                } else {
+                    addToTerminal(`❌ getData() - FAILED (function not defined)`, 'error');
+                }
+            } catch (e) {
+                addToTerminal(`❌ getData() - ERROR: ${e.message}`, 'error');
+                addToTerminal(`💡 Hint: Missing await before fetch() calls?`, 'info');
             }
 
             // Final summary
