@@ -1,0 +1,27 @@
+{
+  "name": "bugfix-challenge-todo",
+  "version": "1.0.0",
+  "description": "A challenge to fix buggy code before you can push!",
+  "scripts": {
+    "test": "jest",
+    "test:verbose": "jest --no-silent --verbose",
+    "test:score": "node scripts/test-score.js",
+    "test:all": "jest && npm run test:score",
+    "prepare": "husky install"
+  },
+  "keywords": [
+    "challenge",
+    "bugfix",
+    "testing"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.28.5",
+    "@babel/preset-env": "^7.28.5",
+    "husky": "^8.0.3",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^30.2.0",
+    "jsdom": "^22.1.0"
+  }
+}

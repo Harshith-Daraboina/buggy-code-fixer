@@ -1,0 +1,146 @@
+name: Bug Fix Validation
+
+on: 
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm install
+      
+    - name: Run tests
+      id: test
+      run: npm test
+      continue-on-error: true
+      
+    - name: Calculate and display test score
+      if: always()
+      run: |
+        echo "📊 Calculating test scores..."
+        node scripts/test-score.js || true
+        
+    - name: Parse test results and display score
+      if: always()
+      run: |
+        # Try to get JSON output from Jest
+        npm test -- --json --outputFile=jest-results.json --silent 2>&1 || true
+        
+        if [ -f jest-results.json ]; then
+          # Parse JSON and extract scores using Node.js
+          NUM_FAILED=$(node -e "try { const fs=require('fs'); const data=JSON.parse(fs.readFileSync('jest-results.json')); console.log(data.numFailedTests || 0); } catch(e) { console.log(0); }")
+          NUM_PASSED=$(node -e "try { const fs=require('fs'); const data=JSON.parse(fs.readFileSync('jest-results.json')); console.log(data.numPassedTests || 0); } catch(e) { console.log(0); }")
+          NUM_TOTAL=$(node -e "try { const fs=require('fs'); const data=JSON.parse(fs.readFileSync('jest-results.json')); console.log(data.numTotalTests || 0); } catch(e) { console.log(0); }")
+          
+          echo ""
+          echo "════════════════════════════════════════════════════════════"
+          echo "📊 TEST SCORE SUMMARY"
+          echo "════════════════════════════════════════════════════════════"
+          echo "Tests:       $NUM_FAILED failed, $NUM_PASSED passed, $NUM_TOTAL total"
+          echo "════════════════════════════════════════════════════════════"
+          echo ""
+          
+          # Set GitHub Actions notice (visible in UI)
+          echo "::notice title=Test Score::Tests: $NUM_FAILED failed, $NUM_PASSED passed, $NUM_TOTAL total"
+          
+          # Also set as output variable for use in other steps
+          echo "score=$NUM_FAILED failed, $NUM_PASSED passed, $NUM_TOTAL total" >> $GITHUB_OUTPUT
+        else
+          # Fallback: parse from test output using the score script
+          echo "⚠️  Could not find JSON results file, using score calculator..."
+          node scripts/test-score.js || true
+        fi
+      
+    - name: Test Results Summary
+      if: always()
+      run: |
+        if [ "${{ job.status }}" == "success" ]; then
+          echo "🎉 All tests passed! Ready to merge."
+        else
+          echo "❌ Tests failed! Please fix the bugs before merging."
+        fi
+    
+    - name: Comment PR with test score
+      if: github.event_name == 'pull_request' && always()
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          // Only comment if we have test results
+          const fs = require('fs');
+          let score = '';
+          let failed = 0;
+          let passed = 0;
+          let total = 0;
+          
+          if (fs.existsSync('jest-results.json')) {
+            try {
+              const data = JSON.parse(fs.readFileSync('jest-results.json', 'utf8'));
+              failed = data.numFailedTests || 0;
+              passed = data.numPassedTests || 0;
+              total = data.numTotalTests || 0;
+              score = `Tests:       ${failed} failed, ${passed} passed, ${total} total`;
+            } catch (e) {
+              score = 'Could not parse test results';
+            }
+          } else {
+            score = 'Test results file not found';
+          }
+          
+          const comment = `## 📊 Test Score Summary
+          
+          \`\`\`
+          ════════════════════════════════════════════════════════════
+          📊 TEST SCORE SUMMARY
+          ════════════════════════════════════════════════════════════
+          ${score}
+          ════════════════════════════════════════════════════════════
+          \`\`\`
+          
+          ${failed === 0 && total > 0 ? '✅ All tests passed!' : '❌ Some tests failed. Please review the test results above.'}
+          
+          _This comment is automatically updated on each push to this PR._`;
+          
+          // Find existing comment
+          const { data: comments } = await github.rest.issues.listComments({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+          });
+          
+          const botComment = comments.find(comment => 
+            comment.user.type === 'Bot' && 
+            comment.body.includes('Test Score Summary')
+          );
+          
+          if (botComment) {
+            // Update existing comment
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: botComment.id,
+              body: comment
+            });
+          } else {
+            // Create new comment
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: comment
+            });
+          }

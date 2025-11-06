@@ -1,0 +1,25 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🔍 Running tests before push..."
+
+# Run tests normally (shows output)
+npm test
+TEST_EXIT_CODE=$?
+
+# Calculate and display test scores using Node.js script
+# The script will run tests again with --json if needed, or parse existing output
+echo ""
+node scripts/test-score.js
+
+# Check exit code
+if [ $TEST_EXIT_CODE -ne 0 ]; then
+  echo ""
+  echo "❌ Tests failed! Push rejected."
+  echo "💡 Fix the bugs in buggy-code/script.js and try again."
+  exit 1
+fi
+
+echo ""
+echo "✅ All tests passed! Push allowed."
+exit 0
