@@ -32,7 +32,6 @@ async function submitWithLogId(data) {
   // Simulate logging operation that generates and validates log ID
   const logPromise = new Promise((resolve) => {
     setTimeout(() => {
-      // Log ID is created INSIDE the promise
       const logId = `LOG-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
       console.log(`[${logId}] Submitted data:`, data);
       resolve(logId);
@@ -260,13 +259,10 @@ class Animal {
   constructor(name) { this.name = name; }
   getName() { return this.name; }
 }
-
 class Dog extends Animal {
   bark() {
     console.log(`${this.getName()} says woof!`);
   }
-
- 
   getName() {
     super.getName();
   }
@@ -294,7 +290,6 @@ function detectLeak() {
   }
 
   nodes.forEach(n => n.remove());
-  // nodes = []; ❌ not allowed (const)
   console.log("No leaks detected");
 }
 
@@ -331,7 +326,7 @@ class LRUCache {
   set(key, value) {
     this.cache.set(key, value);
     if (this.cache.size > this.limit) {
-      const oldestKey = this.cache.keys()[0];//❌ undefined — looks okay but wrong
+      const oldestKey = this.cache.keys()[0];
       this.cache.delete(oldestKey);
     }
   }
@@ -349,7 +344,7 @@ class LRUCache {
 // ❌ Bug: Current implementation uses spread operator which doesn't protect against __proto__ keys.
 // The function should merge user data safely, but currently allows prototype pollution.
 // Example attack: mergeUserData({}, JSON.parse('{"__proto__": {"isAdmin": true}}')) could pollute Object.prototype
-// Expected: Should safely merge objects without allowing __proto__, constructor.prototype or any other keys to pollute the prototype.
+
 
 
 function mergeUserData(target, source) {
